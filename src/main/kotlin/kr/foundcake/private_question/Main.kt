@@ -10,6 +10,7 @@ import kr.foundcake.private_question.database.DBManager
 import kr.foundcake.private_question.extension.slash
 import kr.foundcake.private_question.handler.CommandHandlers
 import kr.foundcake.private_question.handler.modalHandler
+import kr.foundcake.private_question.handler.removeChannelHandler
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel
@@ -30,6 +31,7 @@ fun main() = runBlocking{
 	cmdHandlers.registerCheck()
 
 	modalHandler(jda)
+	removeChannelHandler(jda)
 
 	dbSetup.await()
 
@@ -48,7 +50,7 @@ fun setupCommand(jda: JDA) {
 			option<ForumChannel>("포럼채널", "질문이 올라갈 포럼 채널을 선택해주세요", true)
 		}
 		slash(Commands.CHECK_QUESTIONER) {
-			restrict(true, Permission.MANAGE_SERVER)
+			restrict(true, Permission.MANAGE_THREADS)
 		}
 		slash(Commands.PRIVATE_QUESTION) {
 			restrict(true)

@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManagerFactory
 import jakarta.persistence.EntityTransaction
 import jakarta.persistence.Persistence
 import kr.foundcake.private_question.entity.ServerSetting
+import kr.foundcake.private_question.entity.Writer
 import org.hibernate.cfg.AvailableSettings
 
 object DBManager {
@@ -35,18 +36,20 @@ object DBManager {
 	}
 
 	private inline fun commit(block: () -> Unit) {
-		tx.begin()
-		block()
-		tx.commit()
+		synchronized(tx) {
+			tx.begin()
+			block()
+			tx.commit()
+		}
 	}
 
 	object SeverSettingRepo {
-		fun find(serverId: Long) : ServerSetting{
+		fun find(serverId: Long) : ServerSetting? {
 			var result: ServerSetting? = null
 			commit {
 				result = em.find(ServerSetting::class.java, serverId)
 			}
-			return result!!
+			return result
 		}
 
 		fun save(setting: ServerSetting) {
@@ -58,6 +61,40 @@ object DBManager {
 					return@commit
 				}
 				em.merge(setting)
+			}
+		}
+
+		fun remove(setting: ServerSetting) {
+			commit {
+				em.remove(setting)
+			}
+		}
+	}
+
+	object WriterRepo {
+		fun find(channel: Long) : Writer?{
+			var result: Writer? = null
+			commit {
+				result = em.find(Writer::class.java, channel)
+			}
+			return result
+		}
+
+		fun save(writer: Writer) {
+			commit {
+				try {
+					em.find(Writer::class.java, writer.channel)
+				}catch (e: Exception) {
+					em.persist(writer)
+					return@commit
+				}
+				em.merge(writer)
+			}
+		}
+
+		fun remove(writer: Writer) {
+			commit {
+				em.remove(writer)
 			}
 		}
 	}
