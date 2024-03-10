@@ -66,11 +66,14 @@ class CommandHandlers(private val jda: JDA) {
 	fun registerCheck() {
 		jda.onCommand(Commands.CHECK_QUESTIONER) {
 			if(it.channel?.type !== ChannelType.GUILD_PUBLIC_THREAD) {
+				it.reply("비공개 질문 쓰레드에서만 가능합니다.")
+					.setEphemeral(true)
+					.queue()
 				return@onCommand
 			}
 			val writer: Writer? = DBManager.WriterRepo.find(it.channel!!.idLong)
 			if(writer === null) {
-				it.reply("비공개 질문 쓰레드가 아닙니다.")
+				it.reply("비공개 질문 쓰레드에서만 가능합니다.")
 					.setEphemeral(true)
 					.queue()
 				return@onCommand
