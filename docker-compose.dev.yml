@@ -10,7 +10,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
       - MYSQL_DATABASE=${DB_NAME}
     ports:
-      - "3305:3306"
+      - "3306:3306"
 
   bot:
     container_name: DiscordBot
