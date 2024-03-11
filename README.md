@@ -11,6 +11,9 @@
     DB_NAME=YOUR_DB_NAME
     ```
 3. docker-compose.prod.yml 파일을 실행시킨다.
+   ```bash
+   docker-compose -f docker-compose.prod.yml up -d
+   ```
 
 ## Command
 |   명령어   |    필요권한    |
