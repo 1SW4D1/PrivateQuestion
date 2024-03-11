@@ -42,3 +42,13 @@ jobs:
         asset_path: ./build/libs/PrivateQuestion.jar
         asset_name: PrivateQuestion.jar
         asset_content_type: application/java-archive
+
+    - name: Upload Release Asset(docker-compose)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./docker-compose.prod.yml
+        asset_name: docker-compose.prod.yml
+        asset_content_type: text/plain
