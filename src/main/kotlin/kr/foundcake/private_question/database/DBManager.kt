@@ -1,100 +1,109 @@
 package kr.foundcake.private_question.database
 
-import jakarta.persistence.EntityManager
-import jakarta.persistence.EntityManagerFactory
-import jakarta.persistence.EntityTransaction
-import jakarta.persistence.Persistence
-import kr.foundcake.private_question.entity.ServerSetting
-import kr.foundcake.private_question.entity.Writer
-import org.hibernate.cfg.AvailableSettings
+import com.mysql.cj.jdbc.Driver
+import kr.foundcake.private_question.dto.ServerSetting
+import kr.foundcake.private_question.dto.Writer
+import kr.foundcake.private_question.table.ServerSettings
+import kr.foundcake.private_question.table.Writers
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.slf4j.LoggerFactory
 
 object DBManager {
 
-	private val emf: EntityManagerFactory
-
-	private val em: EntityManager
-
-	private val tx: EntityTransaction
+	private val logger = LoggerFactory.getLogger(DBManager::class.java)
 
 	init {
 		val name = System.getenv("DB_NAME")
 		val pw = System.getenv("DB_PASSWORD")
 
-		emf = Persistence.createEntityManagerFactory("kr.foundcake.private_question.jpa", mutableMapOf<String, String>(
-			AvailableSettings.JAKARTA_JDBC_URL to "jdbc:mysql://mysql:3306/${name}",
-			AvailableSettings.JAKARTA_JDBC_PASSWORD to pw
-		))
-		em = emf.createEntityManager()
-		tx = em.transaction
+		Database.connect(
+			driver = Driver::class.qualifiedName!!,
+			url = "jdbc:mysql://mysql:3306/${name}",
+			user = "root",
+			password = pw
+		)
+
+		logger.info("Connected Database")
+
+		transaction {
+			SchemaUtils.create(ServerSettings)
+			SchemaUtils.create(Writers)
+		}
+		logger.info("initialize table")
 	}
 
 	fun init() {}
 
-	fun close() {
-		em.close()
-		emf.close()
-	}
-
-	private inline fun commit(block: () -> Unit) {
-		synchronized(tx) {
-			tx.begin()
-			block()
-			tx.commit()
-		}
-	}
-
 	object SeverSettingRepo {
-		fun find(serverId: Long) : ServerSetting? {
-			var result: ServerSetting? = null
-			commit {
-				result = em.find(ServerSetting::class.java, serverId)
-			}
-			return result
-		}
-
-		fun save(setting: ServerSetting) {
-			commit {
-				try {
-					em.find(ServerSetting::class.java, setting.serverId)
-				}catch (e: Exception) {
-					em.persist(setting)
-					return@commit
+		suspend fun find(serverId: Long): ServerSetting? {
+			var setting: ServerSetting? = null
+			newSuspendedTransaction {
+				val result: ResultRow? = ServerSettings.selectAll().where {
+					ServerSettings.serverId eq serverId
+				}.limit(1).singleOrNull()
+				if (result !== null) {
+					setting = ServerSetting(result[ServerSettings.serverId], result[ServerSettings.channel])
 				}
-				em.merge(setting)
+			}
+			return setting
+		}
+
+		suspend fun save(setting: ServerSetting) {
+			newSuspendedTransaction {
+				val count: Long = ServerSettings.selectAll().where {
+					ServerSettings.serverId eq setting.serverId
+				}.limit(1).count()
+				if (count < 1) {
+					ServerSettings.insert {
+						it[serverId] = setting.serverId
+						it[channel] = setting.channel
+					}
+				} else {
+					ServerSettings.update(where = { ServerSettings.serverId eq setting.serverId }) {
+						it[channel] = setting.channel
+					}
+				}
 			}
 		}
 
-		fun remove(setting: ServerSetting) {
-			commit {
-				em.remove(setting)
+		suspend fun remove(setting: ServerSetting) {
+			newSuspendedTransaction {
+				ServerSettings.deleteWhere {
+					serverId eq setting.serverId
+				}
 			}
 		}
 	}
 
 	object WriterRepo {
-		fun find(channel: Long) : Writer?{
-			var result: Writer? = null
-			commit {
-				result = em.find(Writer::class.java, channel)
-			}
-			return result
-		}
-
-		fun save(writer: Writer) {
-			commit {
-				try {
-					em.find(Writer::class.java, writer.channel)
-				}catch (e: Exception) {
-					em.persist(writer)
-					return@commit
+		suspend fun find(threadId: Long): Writer? {
+			var writer: Writer? = null
+			newSuspendedTransaction {
+				val result: ResultRow? = Writers.selectAll().where {
+					Writers.threadId eq threadId
+				}.limit(1).singleOrNull()
+				if (result !== null) {
+					writer = Writer(result[Writers.threadId], result[Writers.user])
 				}
-				em.merge(writer)
+			}
+			return writer
+		}
+
+		suspend fun save(writer: Writer) {
+			newSuspendedTransaction {
+				Writers.insert {
+					it[threadId] = writer.threadId
+					it[user] = writer.user
+				}
 			}
 		}
 
-		fun remove(writer: Writer) {
-			commit {
-				em.remove(writer)
+		suspend fun remove(writer: Writer) {
+			newSuspendedTransaction {
+				Writers.deleteWhere { threadId eq writer.threadId }
 			}
 		}
 	}

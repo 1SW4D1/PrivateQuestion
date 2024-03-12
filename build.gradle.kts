@@ -10,6 +10,8 @@ repositories {
     mavenCentral()
 }
 
+
+val exposedVersion = "0.48.0"
 dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     implementation(kotlin("stdlib"))
@@ -21,9 +23,8 @@ dependencies {
     implementation("club.minnced:jda-ktx:0.11.0-beta.20")
     implementation("ch.qos.logback:logback-classic:1.5.3")
     // DB
-    implementation(enforcedPlatform("org.hibernate.orm:hibernate-platform:6.4.4.Final"))
-    implementation("org.hibernate.orm:hibernate-core")
-    implementation("jakarta.transaction:jakarta.transaction-api")
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("com.mysql:mysql-connector-j:8.2.0")
 }
 

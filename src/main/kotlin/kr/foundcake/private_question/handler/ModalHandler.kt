@@ -4,8 +4,8 @@ import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.generics.getChannel
 import kr.foundcake.private_question.database.DBManager
-import kr.foundcake.private_question.entity.ServerSetting
-import kr.foundcake.private_question.entity.Writer
+import kr.foundcake.private_question.dto.ServerSetting
+import kr.foundcake.private_question.dto.Writer
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel

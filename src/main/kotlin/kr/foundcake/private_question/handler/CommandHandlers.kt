@@ -3,8 +3,8 @@ package kr.foundcake.private_question.handler
 import dev.minn.jda.ktx.interactions.components.TextInput
 import kr.foundcake.private_question.command.Commands
 import kr.foundcake.private_question.database.DBManager
-import kr.foundcake.private_question.entity.ServerSetting
-import kr.foundcake.private_question.entity.Writer
+import kr.foundcake.private_question.dto.ServerSetting
+import kr.foundcake.private_question.dto.Writer
 import kr.foundcake.private_question.extension.onCommand
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.channel.ChannelType

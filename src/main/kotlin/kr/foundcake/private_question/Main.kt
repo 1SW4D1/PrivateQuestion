@@ -1,8 +1,10 @@
 package kr.foundcake.private_question
 
-import dev.minn.jda.ktx.events.listener
-import dev.minn.jda.ktx.interactions.commands.*
+import dev.minn.jda.ktx.interactions.commands.option
+import dev.minn.jda.ktx.interactions.commands.restrict
+import dev.minn.jda.ktx.interactions.commands.updateCommands
 import dev.minn.jda.ktx.jdabuilder.default
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kr.foundcake.private_question.command.Commands
@@ -14,11 +16,10 @@ import kr.foundcake.private_question.handler.removeChannelHandler
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel
-import net.dv8tion.jda.api.events.session.ShutdownEvent
 
 
 fun main() = runBlocking{
-	val dbSetup = async { DBManager.init() }
+	val dbSetup: Deferred<Unit> = async { DBManager.init() }
 
 	val token: String = System.getenv("TOKEN")
 	val jda: JDA = default(token, true)
@@ -34,10 +35,6 @@ fun main() = runBlocking{
 	removeChannelHandler(jda)
 
 	dbSetup.await()
-
-	jda.listener<ShutdownEvent> {
-		DBManager.close()
-	}
 
 	jda.awaitReady()
 	return@runBlocking
