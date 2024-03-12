@@ -15,7 +15,7 @@ object DBManager {
 
 	private val logger = LoggerFactory.getLogger(DBManager::class.java)
 
-	init {
+	fun init() {
 		val name = System.getenv("DB_NAME")
 		val pw = System.getenv("DB_PASSWORD")
 
@@ -34,8 +34,6 @@ object DBManager {
 		}
 		logger.info("initialize table")
 	}
-
-	fun init() {}
 
 	object SeverSettingRepo {
 		suspend fun find(serverId: Long): ServerSetting? {
