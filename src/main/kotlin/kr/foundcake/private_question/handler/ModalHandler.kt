@@ -6,6 +6,8 @@ import dev.minn.jda.ktx.generics.getChannel
 import kr.foundcake.private_question.database.DBManager
 import kr.foundcake.private_question.dto.ServerSetting
 import kr.foundcake.private_question.dto.Writer
+import kr.foundcake.private_question.extension.getValue
+import kr.foundcake.private_question.identifiers.Identifiers
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel
@@ -14,7 +16,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData
 
 fun modalHandler(jda: JDA) {
 	jda.listener<ModalInteractionEvent> {
-		if(it.modalId != "private-question") {
+		if(Identifiers.QUESTION_MODAL not it.modalId) {
 			return@listener
 		}
 		val setting: ServerSetting? = DBManager.SeverSettingRepo.find(it.guild!!.idLong)
@@ -35,8 +37,8 @@ fun modalHandler(jda: JDA) {
 		}
 
 		val post = channel.createForumPost(
-			it.getValue("title")!!.asString,
-			MessageCreateData.fromContent(it.getValue("content")!!.asString)
+			it.getValue(Identifiers.QUESTION_MODAL_INPUT_TITLE).asString,
+			MessageCreateData.fromContent(it.getValue(Identifiers.QUESTION_MODAL_INPUT_CONTENT).asString)
 		).await()
 
 		DBManager.WriterRepo.save(Writer(

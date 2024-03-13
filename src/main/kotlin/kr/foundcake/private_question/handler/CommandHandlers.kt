@@ -6,6 +6,7 @@ import kr.foundcake.private_question.database.DBManager
 import kr.foundcake.private_question.dto.ServerSetting
 import kr.foundcake.private_question.dto.Writer
 import kr.foundcake.private_question.extension.onCommand
+import kr.foundcake.private_question.identifiers.Identifiers
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel
@@ -37,12 +38,12 @@ class CommandHandlers(private val jda: JDA) {
 			it.replyModal(
 				Modal
 				.create(
-					"private-question",
+					Identifiers.QUESTION_MODAL.id,
 					"질문작성",
 				)
 				.addActionRow(
 					TextInput(
-						id = "title",
+						id = Identifiers.QUESTION_MODAL_INPUT_TITLE.id,
 						label = "제목",
 						style = TextInputStyle.SHORT,
 						required = true,
@@ -51,7 +52,7 @@ class CommandHandlers(private val jda: JDA) {
 				)
 				.addActionRow(
 					TextInput(
-						id = "content",
+						id = Identifiers.QUESTION_MODAL_INPUT_CONTENT.id,
 						label = "내용",
 						style = TextInputStyle.PARAGRAPH,
 						required = true,
