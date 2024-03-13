@@ -8,5 +8,7 @@ object Writers : Table("writers") {
 
 	val user = varchar("user", 40)
 
+	val serverId = long("serverId")
+
 	override val primaryKey = PrimaryKey(threadId)
 }

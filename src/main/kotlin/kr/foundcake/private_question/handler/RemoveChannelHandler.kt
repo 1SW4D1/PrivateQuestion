@@ -8,20 +8,18 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent
 
-fun removeChannelHandler(jda: JDA) {
+fun handleRemoveChannel(jda: JDA) {
 	jda.listener<ChannelDeleteEvent> {
 		when(it.channel.type) {
 			ChannelType.FORUM -> {
-				val setting: ServerSetting? = DBManager.SeverSettingRepo.find(it.guild.idLong)
+				val setting: ServerSetting? = DBManager.ServerSettingRepo.find(it.guild.idLong)
 				if(setting !== null && setting.channel == it.channel.idLong) {
-					DBManager.SeverSettingRepo.remove(setting)
+					DBManager.ServerSettingRepo.remove(setting)
+					DBManager.WriterRepo.removeByServerId(it.guild.idLong)
 				}
 			}
 			ChannelType.GUILD_PUBLIC_THREAD -> {
-				val writer: Writer? = DBManager.WriterRepo.find(it.channel.idLong)
-				if(writer !== null) {
-					DBManager.WriterRepo.remove(writer)
-				}
+				DBManager.WriterRepo.remove(it.channel.idLong)
 			}
 			else -> Unit
 		}

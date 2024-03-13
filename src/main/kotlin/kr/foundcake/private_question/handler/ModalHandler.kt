@@ -14,12 +14,12 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.utils.messages.MessageCreateData
 
-fun modalHandler(jda: JDA) {
+fun handleModal(jda: JDA) {
 	jda.listener<ModalInteractionEvent> {
 		if(Identifiers.QUESTION_MODAL not it.modalId) {
 			return@listener
 		}
-		val setting: ServerSetting? = DBManager.SeverSettingRepo.find(it.guild!!.idLong)
+		val setting: ServerSetting? = DBManager.ServerSettingRepo.find(it.guild!!.idLong)
 		if(setting === null) {
 			it.reply("설정이 안되어 있습니다. 서버 관리자에게 문의하십쇼.")
 				.setEphemeral(true)
@@ -32,7 +32,7 @@ fun modalHandler(jda: JDA) {
 			it.reply("기존 채널이 삭제되었습니다. 서버 관리자에게 문의하십쇼")
 				.setEphemeral(true)
 				.queue()
-			DBManager.SeverSettingRepo.remove(setting)
+			DBManager.ServerSettingRepo.remove(setting)
 			return@listener
 		}
 
@@ -43,7 +43,8 @@ fun modalHandler(jda: JDA) {
 
 		DBManager.WriterRepo.save(Writer(
 			post.threadChannel.idLong,
-			it.user.asMention
+			it.user.asMention,
+			it.guild!!.idLong
 		))
 
 		it.reply("질문이 추가되었습니다.")

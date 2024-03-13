@@ -11,8 +11,9 @@ import kr.foundcake.private_question.command.Commands
 import kr.foundcake.private_question.database.DBManager
 import kr.foundcake.private_question.extension.slash
 import kr.foundcake.private_question.handler.CommandHandlers
-import kr.foundcake.private_question.handler.modalHandler
-import kr.foundcake.private_question.handler.removeChannelHandler
+import kr.foundcake.private_question.handler.handleKickHandler
+import kr.foundcake.private_question.handler.handleModal
+import kr.foundcake.private_question.handler.handleRemoveChannel
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel
@@ -31,8 +32,9 @@ fun main() = runBlocking{
 	cmdHandlers.registerQuestion()
 	cmdHandlers.registerCheck()
 
-	modalHandler(jda)
-	removeChannelHandler(jda)
+	handleModal(jda)
+	handleRemoveChannel(jda)
+	handleKickHandler(jda)
 
 	dbSetup.await()
 

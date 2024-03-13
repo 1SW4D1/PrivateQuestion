@@ -35,7 +35,7 @@ object DBManager {
 		logger.info("initialize table")
 	}
 
-	object SeverSettingRepo {
+	object ServerSettingRepo {
 		suspend fun find(serverId: Long): ServerSetting? {
 			var setting: ServerSetting? = null
 			newSuspendedTransaction {
@@ -74,6 +74,14 @@ object DBManager {
 				}
 			}
 		}
+
+		suspend fun remove(serverId: Long) {
+			newSuspendedTransaction {
+				ServerSettings.deleteWhere {
+					this.serverId eq serverId
+				}
+			}
+		}
 	}
 
 	object WriterRepo {
@@ -84,7 +92,7 @@ object DBManager {
 					Writers.threadId eq threadId
 				}.limit(1).singleOrNull()
 				if (result !== null) {
-					writer = Writer(result[Writers.threadId], result[Writers.user])
+					writer = Writer(result[Writers.threadId], result[Writers.user], result[Writers.serverId])
 				}
 			}
 			return writer
@@ -95,6 +103,7 @@ object DBManager {
 				Writers.insert {
 					it[threadId] = writer.threadId
 					it[user] = writer.user
+					it[serverId] = writer.serverId
 				}
 			}
 		}
@@ -102,6 +111,18 @@ object DBManager {
 		suspend fun remove(writer: Writer) {
 			newSuspendedTransaction {
 				Writers.deleteWhere { threadId eq writer.threadId }
+			}
+		}
+
+		suspend fun remove(threadId: Long) {
+			newSuspendedTransaction {
+				Writers.deleteWhere { this.threadId eq threadId }
+			}
+		}
+
+		suspend fun removeByServerId(serverId: Long) {
+			newSuspendedTransaction {
+				Writers.deleteWhere { this.serverId eq serverId }
 			}
 		}
 	}

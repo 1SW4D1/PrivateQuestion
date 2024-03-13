@@ -26,7 +26,7 @@ class CommandHandlers(private val jda: JDA) {
 					.queue()
 				return@onCommand
 			}
-			DBManager.SeverSettingRepo.save(ServerSetting(it.guild!!.idLong, channel.idLong))
+			DBManager.ServerSettingRepo.save(ServerSetting(it.guild!!.idLong, channel.idLong))
 			it.reply("설정되었습니다")
 				.setEphemeral(true)
 				.queue()
