@@ -3,7 +3,6 @@ package kr.foundcake.private_question.handler
 import dev.minn.jda.ktx.events.listener
 import kr.foundcake.private_question.database.DBManager
 import kr.foundcake.private_question.dto.ServerSetting
-import kr.foundcake.private_question.dto.Writer
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent
